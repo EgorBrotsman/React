@@ -24,6 +24,8 @@ function App() {
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
+        </p><p>
+          New Test Text
         </p>
       </div>
       <p className="read-the-docs">

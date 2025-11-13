@@ -37,11 +37,25 @@ services:
       - nexus
     networks:
       - ci-network
+  teamcity-agent:
+    image: jetbrains/teamcity-agent:latest
+    container_name: teamcity-agent
+    restart: unless-stopped
+    environment:
+      - SERVER_URL=http://teamcity:8111
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # для Docker-in-Docker
+      - teamcity-agent-conf:/data/teamcity_agent/conf
+    depends_on:
+      - teamcity
+    networks:
+      - ci-network
 
 volumes:
   nexus-data:
   teamcity-data:
   teamcity-logs:
+  teamcity-agent-conf:
 
 networks:
   ci-network:
