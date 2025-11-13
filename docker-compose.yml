@@ -1,0 +1,48 @@
+services:
+  react-app:
+    build:
+      context: .  # путь к папке с Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "4173:4173"  # хост:контейнер
+    environment:
+      - PORT=4173
+      - VITE_TEST=DOCKER_ENV
+    container_name: react-app
+    restart: unless-stopped
+  nexus:
+    image:  sonatype/nexus3:latest
+    container_name: nexus
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS=-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m
+    networks:
+      - ci-network
+  teamcity:
+    image: jetbrains/teamcity-server:latest
+    container_name: teamcity-server
+    restart: unless-stopped
+    ports:
+      - "8111:8111"
+    volumes:
+      - teamcity-data:/data/teamcity_server/datadir
+      - teamcity-logs:/opt/teamcity/logs
+    environment:
+      - TEAMCITY_SERVER_MEM_OPTS=-Xmx2g
+    depends_on:
+      - nexus
+    networks:
+      - ci-network
+
+volumes:
+  nexus-data:
+  teamcity-data:
+  teamcity-logs:
+
+networks:
+  ci-network:
+    driver: bridge
